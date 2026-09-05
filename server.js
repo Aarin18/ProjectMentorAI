@@ -80,11 +80,12 @@ async function generateGeminiJson(systemInstruction, prompt, responseSchema, val
   try {
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
-      model: 'models/gemini-3.5-flash-lite',
+      model: 'gemini-3.6-flash',
       contents: prompt,
       config: {
         systemInstruction,
         responseMimeType: 'application/json',
+        responseSchema,
         temperature: 0.7,
       },
     });
@@ -109,7 +110,7 @@ async function generateGeminiText(systemInstruction, prompt, attempt = 0) {
   try {
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
-      model: 'models/gemini-3.5-flash-lite',
+      model: 'gemini-3.6-flash',
       contents: prompt,
       config: { systemInstruction, temperature: 0.7 },
     });
@@ -120,6 +121,7 @@ async function generateGeminiText(systemInstruction, prompt, attempt = 0) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       return generateGeminiText(systemInstruction, prompt, attempt + 1);
     }
+    console.error('[Gemini] Text request:', error?.status || 'unknown', error?.message || 'unknown error');
     throw new Error('AI analysis is temporarily unavailable. Please try again later.');
   }
 }
@@ -140,7 +142,9 @@ app.post('/api/analyze-project', async (req, res) => {
   try {
     const profile = req.body;
 
-    if (!profile || !profile.skills) {
+    if (!profile || !profile.skills || !profile.interests || !profile.experience
+      || !profile.careerGoal || !profile.budget || !profile.timeline
+      || !Number.isInteger(profile.teamSize)) {
       return res.status(400).json({ error: 'Invalid request. Please fill out all profile fields.' });
     }
 
@@ -154,6 +158,7 @@ Interests: ${profile.interests}
 Experience: ${profile.experience}
 Career Goal: ${profile.careerGoal}
 Team Size: ${profile.teamSize}
+Budget: ${profile.budget}
 Timeline: ${profile.timeline}`;
 
     console.log('[Analyze] Calling Gemini');

@@ -5,7 +5,7 @@
 
 import { validateStudentProfile } from './validation.js';
 import { StorageKeys, saveItem, loadItem, removeItem } from './storage.js';
-import { analyzeProject } from './api.js';
+import { analyzeProject, sendMentorMessage } from './api.js';
 import { initNavigation } from './nav.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const mentorChatForm = document.getElementById('mentor-chat-form');
   const mentorChatInput = document.getElementById('mentor-chat-input');
   const mentorChatMessages = document.getElementById('mentor-chat-messages');
+  const generateButton = document.getElementById('generate-ideas-btn');
+  let isAnalyzing = false;
+  let isChatting = false;
 
   // Load saved state
   const savedProfile = loadItem(StorageKeys.PROFILE);
@@ -37,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('experience').value = savedProfile.experience || '';
     document.getElementById('career-goal').value = savedProfile.careerGoal || '';
     document.getElementById('team-size').value = savedProfile.teamSize || '1';
+    document.getElementById('budget').value = savedProfile.budget || '';
     document.getElementById('timeline').value = savedProfile.timeline || '';
   }
 
@@ -56,8 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
   mentorChatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const message = mentorChatInput.value.trim();
-    if (!message) return;
+    if (!message || isChatting) return;
 
+    isChatting = true;
     addMentorMessage(message, 'user');
     mentorChatInput.value = '';
     const thinkingMessage = addMentorMessage('Thinking...', 'ai');
@@ -73,12 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
         technology: analysis.recommendedTechStack || [],
         teamSize: profile.teamSize || 1,
         timeline: profile.timeline || '',
-        budget: '',
+        budget: profile.budget || '',
       });
       thinkingMessage.textContent = response;
     } catch (error) {
       thinkingMessage.textContent = error.userMessage || 'Sorry, I couldn\'t connect to the AI mentor right now. Please try again.';
     } finally {
+      isChatting = false;
       mentorChatInput.disabled = false;
       mentorChatInput.focus();
     }
@@ -95,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (isAnalyzing) return;
     hideStatus();
 
     const rawProfile = {
@@ -103,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
       experience: document.getElementById('experience').value,
       careerGoal: document.getElementById('career-goal').value,
       teamSize: parseInt(document.getElementById('team-size').value, 10),
+      budget: document.getElementById('budget').value,
       timeline: document.getElementById('timeline').value,
     };
 
@@ -113,6 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const profile = validation.value;
+    isAnalyzing = true;
+    generateButton.disabled = true;
+    generateButton.textContent = 'Analyzing...';
     saveItem(StorageKeys.PROFILE, profile);
 
     // Clear previous results
@@ -136,6 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
       ideasLoading.classList.add('hidden');
       ideasSection.classList.add('hidden');
       showStatus(error.userMessage || error.message, 'error');
+    } finally {
+      isAnalyzing = false;
+      generateButton.disabled = false;
+      generateButton.textContent = 'Analyze My Project';
     }
   });
 
@@ -147,9 +162,13 @@ document.addEventListener('DOMContentLoaded', () => {
     card.className = 'idea-card idea-card--selected';
     card.innerHTML = `
         <div class="idea-card__header">
-          <div class="idea-card__rank">Feasibility Score</div>
+          <div class="idea-card__rank">AI Feasibility Analysis</div>
           <h3 class="idea-card__title">${escapeHtml(analysis.verdict)}</h3>
           <p class="idea-card__description">${escapeHtml(analysis.summary)}</p>
+        </div>
+        <div class="analysis-score" aria-label="Feasibility score ${analysis.feasibilityScore} out of 100">
+          <span class="analysis-score__label">Feasibility Score</span>
+          <strong>${analysis.feasibilityScore}<small>/100</small></strong>
         </div>
         <dl class="idea-card__details">
           <div class="idea-card__detail">
@@ -166,17 +185,14 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </dl>
         <div class="score-panel">
-          <h4 class="score-panel__heading">
-            <span>Project Feasibility</span>
-            <span class="score-panel__overall">${analysis.feasibilityScore}%</span>
-          </h4>
+          <h4 class="score-panel__heading"><span>Project plan at a glance</span></h4>
           <dl class="score-list">
-            ${renderListRow('Required Skills', analysis.requiredSkills)}
-            ${renderListRow('Recommended Stack', analysis.recommendedTechStack)}
-            ${renderListRow('Risks', analysis.risks)}
-            ${renderListRow('Improvements', analysis.improvements)}
-            ${renderListRow('Mentor Advice', analysis.mentorAdvice)}
-            ${renderListRow('Roadmap', analysis.roadmap)}
+            ${renderListRow('Required Skills', analysis.requiredSkills, 'skills')}
+            ${renderListRow('Recommended Tech Stack', analysis.recommendedTechStack, 'stack')}
+            ${renderListRow('Risks', analysis.risks, 'risks')}
+            ${renderListRow('Improvements', analysis.improvements, 'improvements')}
+            ${renderListRow('Mentor Advice', analysis.mentorAdvice, 'advice')}
+            ${renderListRow('Step-by-step Roadmap', analysis.roadmap, 'roadmap')}
           </dl>
         </div>
       `;
@@ -184,8 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ideasGrid.appendChild(card);
   }
 
-  function renderListRow(label, values) {
-    return `<div class="score-row"><dt class="score-row__label">${escapeHtml(label)}</dt><dd class="score-row__value">${escapeHtml(values.join(', '))}</dd></div>`;
+  function renderListRow(label, values, className) {
+    const items = values.map((value) => `<li>${escapeHtml(value)}</li>`).join('');
+    return `<div class="score-row score-row--${className}"><dt class="score-row__label">${escapeHtml(label)}</dt><dd class="score-row__value"><ul>${items}</ul></dd></div>`;
   }
 
   function showStatus(message, type) {

@@ -12,6 +12,7 @@ const PROFILE_LIMITS = Object.freeze({
   experience: { minLength: 2, maxLength: 2000 },
   careerGoal: { minLength: 2, maxLength: 500 },
   teamSize: { min: 1, max: 20 },
+  budget: { minLength: 2, maxLength: 200 },
   timeline: { minLength: 2, maxLength: 100 },
 });
 
@@ -94,6 +95,7 @@ function validateStudentProfile(profile) {
     ['interests', 'Enter at least one area of interest.'],
     ['experience', 'Describe your relevant experience.'],
     ['careerGoal', 'Enter a career goal.'],
+    ['budget', 'Describe your available project budget.'],
     ['timeline', 'Enter the project timeline.'],
   ];
 
@@ -122,6 +124,7 @@ function validateStudentProfile(profile) {
     experience: profile.experience.trim(),
     careerGoal: profile.careerGoal.trim(),
     teamSize: profile.teamSize,
+    budget: profile.budget.trim(),
     timeline: profile.timeline.trim(),
   };
 
