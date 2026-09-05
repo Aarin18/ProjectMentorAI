@@ -46,4 +46,30 @@ async function analyzeProject(profile) {
   }
 }
 
-export { analyzeProject };
+async function sendMentorMessage(message, projectContext) {
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, projectContext }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || typeof data.response !== 'string') {
+      throw normalizeError({
+        code: ERROR_CODES.HTTP_ERROR,
+        message: `HTTP error! status: ${response.status}`,
+        userMessage: data.error || 'Sorry, I couldn\'t connect to the AI mentor right now. Please try again.',
+      });
+    }
+    return data.response;
+  } catch (error) {
+    if (error.code) throw error;
+    throw normalizeError(error, {
+      code: ERROR_CODES.NETWORK_ERROR,
+      userMessage: 'Sorry, I couldn\'t connect to the AI mentor right now. Please try again.',
+    });
+  }
+}
+
+export { analyzeProject, sendMentorMessage };

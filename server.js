@@ -100,6 +100,30 @@ async function generateGeminiJson(systemInstruction, prompt, responseSchema, val
   }
 }
 
+async function generateGeminiText(systemInstruction, prompt, attempt = 0) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('AI analysis is temporarily unavailable. Please try again later.');
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: 'models/gemini-3.5-flash-lite',
+      contents: prompt,
+      config: { systemInstruction, temperature: 0.7 },
+    });
+    if (!response.text || !response.text.trim()) throw new Error('Empty Gemini response.');
+    return response.text.trim();
+  } catch (error) {
+    if (error?.status === 503 && attempt < 2) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return generateGeminiText(systemInstruction, prompt, attempt + 1);
+    }
+    throw new Error('AI analysis is temporarily unavailable. Please try again later.');
+  }
+}
+
 // --- Startup: check for GEMINI_API_KEY ---
 if (process.env.GEMINI_API_KEY) {
   console.log('✓ GEMINI_API_KEY is configured (server-side secret detected).');
@@ -139,6 +163,40 @@ Timeline: ${profile.timeline}`;
     res.json(data);
   } catch (error) {
     console.error('[Analyze] Gemini request failed');
+    res.status(503).json({ error: 'AI analysis is temporarily unavailable. Please try again later.' });
+  }
+});
+
+app.post('/api/chat', async (req, res) => {
+  console.log('[Chat] Request received');
+  try {
+    const { message, projectContext } = req.body || {};
+    if (typeof message !== 'string' || !message.trim()) {
+      return res.status(400).json({ error: 'Please enter a question for your project mentor.' });
+    }
+
+    const context = projectContext && typeof projectContext === 'object' ? projectContext : {};
+    const systemInstruction = `You are ProjectMentorAI, an experienced software project mentor.
+
+Your job is to help students build realistic projects. Use the student's project context when answering. Give practical, beginner-friendly advice. If the student's idea is too complex, explain why and suggest a simpler version. Recommend appropriate technologies based on the student's skills. Help with project scope, roadmap, implementation, debugging, learning priorities, risks, and time management. Do not invent information. Keep answers concise and actionable. Never ask for or reveal API keys, passwords, or secrets. You are a mentor, not a generic chatbot.`;
+    const prompt = `PROJECT CONTEXT:
+Project title: ${context.projectTitle || 'Not provided'}
+Project description: ${context.projectDescription || 'Not provided'}
+Skills: ${Array.isArray(context.skills) ? context.skills.join(', ') : context.skills || 'Not provided'}
+Technology: ${Array.isArray(context.technology) ? context.technology.join(', ') : context.technology || 'Not provided'}
+Team size: ${context.teamSize || 'Not provided'}
+Timeline: ${context.timeline || 'Not provided'}
+Budget: ${context.budget || 'Not provided'}
+
+STUDENT QUESTION:
+${message.trim()}`;
+
+    console.log('[Chat] Calling Gemini');
+    const response = await generateGeminiText(systemInstruction, prompt);
+    console.log('[Chat] Gemini response received');
+    res.json({ response });
+  } catch (error) {
+    console.error('[Chat] Gemini request failed');
     res.status(503).json({ error: 'AI analysis is temporarily unavailable. Please try again later.' });
   }
 });
@@ -194,5 +252,5 @@ Technologies: ${selectedIdea.technologies.join(', ')}`;
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });

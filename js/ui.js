@@ -21,6 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const ideasLoading = document.getElementById('ideas-loading');
   
   const roadmapSection = document.getElementById('roadmap-section');
+  const mentorChatToggle = document.getElementById('mentor-chat-toggle');
+  const mentorChatPanel = document.getElementById('mentor-chat-panel');
+  const mentorChatClose = document.getElementById('mentor-chat-close');
+  const mentorChatForm = document.getElementById('mentor-chat-form');
+  const mentorChatInput = document.getElementById('mentor-chat-input');
+  const mentorChatMessages = document.getElementById('mentor-chat-messages');
 
   // Load saved state
   const savedProfile = loadItem(StorageKeys.PROFILE);
@@ -35,6 +41,57 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (savedIdeas) renderAnalysis(savedIdeas);
+
+  mentorChatToggle.addEventListener('click', () => {
+    const isOpening = mentorChatPanel.classList.toggle('hidden');
+    mentorChatToggle.setAttribute('aria-expanded', String(!isOpening));
+    if (isOpening) mentorChatInput.focus();
+  });
+
+  mentorChatClose.addEventListener('click', () => {
+    mentorChatPanel.classList.add('hidden');
+    mentorChatToggle.setAttribute('aria-expanded', 'false');
+  });
+
+  mentorChatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = mentorChatInput.value.trim();
+    if (!message) return;
+
+    addMentorMessage(message, 'user');
+    mentorChatInput.value = '';
+    const thinkingMessage = addMentorMessage('Thinking...', 'ai');
+    mentorChatInput.disabled = true;
+
+    try {
+      const profile = loadItem(StorageKeys.PROFILE) || {};
+      const analysis = loadItem(StorageKeys.IDEAS) || {};
+      const response = await sendMentorMessage(message, {
+        projectTitle: analysis.verdict || 'Current Project',
+        projectDescription: analysis.summary || analysis.problemAnalysis || '',
+        skills: profile.skills || [],
+        technology: analysis.recommendedTechStack || [],
+        teamSize: profile.teamSize || 1,
+        timeline: profile.timeline || '',
+        budget: '',
+      });
+      thinkingMessage.textContent = response;
+    } catch (error) {
+      thinkingMessage.textContent = error.userMessage || 'Sorry, I couldn\'t connect to the AI mentor right now. Please try again.';
+    } finally {
+      mentorChatInput.disabled = false;
+      mentorChatInput.focus();
+    }
+  });
+
+  function addMentorMessage(message, sender) {
+    const messageElement = document.createElement('div');
+    messageElement.className = `mentor-chat-message mentor-chat-message--${sender}`;
+    messageElement.textContent = message;
+    mentorChatMessages.appendChild(messageElement);
+    mentorChatMessages.scrollTop = mentorChatMessages.scrollHeight;
+    return messageElement;
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

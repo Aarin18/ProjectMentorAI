@@ -116,6 +116,24 @@
     </footer>
   </div>
 
+  <button type="button" class="mentor-chat-toggle" id="mentor-chat-toggle" aria-controls="mentor-chat-panel" aria-expanded="false">Ask Mentor</button>
+  <section class="mentor-chat-panel hidden" id="mentor-chat-panel" aria-label="Project Mentor AI chat">
+    <div class="mentor-chat-panel__header">
+      <div>
+        <h2>Project Mentor AI</h2>
+        <p>Ask me anything about your project.</p>
+      </div>
+      <button type="button" class="mentor-chat-panel__close" id="mentor-chat-close" aria-label="Close chat">&times;</button>
+    </div>
+    <div class="mentor-chat-panel__messages" id="mentor-chat-messages" aria-live="polite">
+      <div class="mentor-chat-message mentor-chat-message--ai">Hi! I'm your AI Project Mentor. Ask me about your project, technology, difficulty, roadmap, or improvements.</div>
+    </div>
+    <form class="mentor-chat-panel__form" id="mentor-chat-form">
+      <input id="mentor-chat-input" type="text" placeholder="Ask your project mentor..." autocomplete="off" required maxlength="1000">
+      <button type="submit" class="button button--primary">Send</button>
+    </form>
+  </section>
+
   <script type="module" src="js/ui.js"></script>
 </body>
 </html>
