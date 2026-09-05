@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProjectMentor AI</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-header__content">
+        <h1 class="app-header__title">ProjectMentor AI</h1>
+        <nav class="app-header__nav">
+          <a href="#" class="nav-link">About</a>
+          <a href="#" class="nav-link">Generate</a>
+          <a href="#roadmap-section" class="nav-link">My Roadmap</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section id="about-section" class="app-section">
+        <div style="background-color: var(--color-surface); border: var(--border-thick); border-radius: var(--radius-large); padding: 2.5rem; position: relative;">
+          <h2 style="font-family: var(--font-display); font-size: 2rem; font-weight: 900; margin: 0 0 1rem;">About ProjectMentor AI</h2>
+          <p style="margin: 0; font-weight: 600; font-size: 1.1rem; max-width: 65ch;">ProjectMentor AI is a Project Intelligence & Feasibility Engine for final-year students. We help you generate, score, and select technical project ideas tailored to your skills and career goals, then provide a detailed step-by-step mentor roadmap to guide your execution.</p>
+        </div>
+      </section>
+
+      <section id="profile-section" class="app-section profile-section">
+        <span class="rotated-badge">Step 1</span>
+        <div class="section-heading">
+          <h2 class="hero-heading">Find your project.</h2>
+          <p class="section-heading__description">Tell us about your background and what you want to achieve.</p>
+        </div>
+        
+        <form id="profile-form" class="profile-form">
+          <div class="form-grid">
+            <div class="form-field form-field--full">
+              <label for="api-key" class="form-field__label">Gemini API Key</label>
+              <input type="password" id="api-key" placeholder="Enter your Gemini API key" required>
+              <p class="form-field__hint">Your key is stored locally in your browser and is never sent to our servers.</p>
+            </div>
+            
+            <div class="form-field">
+              <label for="skills" class="form-field__label">Skills & Technologies</label>
+              <input type="text" id="skills" placeholder="e.g., Python, React, Data Analysis" required minlength="2" maxlength="1000">
+            </div>
+
+            <div class="form-field">
+              <label for="interests" class="form-field__label">Areas of Interest</label>
+              <input type="text" id="interests" placeholder="e.g., Healthcare, FinTech, Automation" required minlength="2" maxlength="1000">
+            </div>
+
+            <div class="form-field form-field--full">
+              <label for="experience" class="form-field__label">Relevant Experience</label>
+              <textarea id="experience" placeholder="Describe any relevant projects, courses, or work experience..." required minlength="2" maxlength="2000"></textarea>
+            </div>
+
+            <div class="form-field">
+              <label for="career-goal" class="form-field__label">Career Goal</label>
+              <input type="text" id="career-goal" placeholder="e.g., Full-Stack Engineer, Data Scientist" required minlength="2" maxlength="500">
+            </div>
+
+            <div class="form-field">
+              <label for="team-size" class="form-field__label">Team Size</label>
+              <input type="number" id="team-size" value="1" min="1" max="20" required>
+            </div>
+
+            <div class="form-field form-field--full">
+              <label for="timeline" class="form-field__label">Project Timeline</label>
+              <input type="text" id="timeline" placeholder="e.g., 3 months, 6 weeks" required minlength="2" maxlength="100">
+            </div>
+          </div>
+
+          <div id="status-message" class="status-message" aria-live="polite"></div>
+
+          <div class="form-actions">
+            <button type="submit" class="button button--primary" id="generate-ideas-btn">Generate Project Ideas</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="ideas-section" class="app-section hidden">
+        <div class="results-toolbar">
+          <div>
+            <h2 class="results-toolbar__title">Recommended Projects</h2>
+            <p class="results-toolbar__description">Based on your profile, we generated the following ideas.</p>
+          </div>
+        </div>
+
+        <div id="ideas-loading" class="loading-state hidden" aria-live="polite">
+          <div class="loading-state__indicator"></div>
+          <p>Analyzing profile and generating ideas...</p>
+        </div>
+
+        <div id="idea-grid" class="idea-grid">
+          <!-- Idea cards injected here via JS -->
+        </div>
+      </section>
+
+      <section id="roadmap-section" class="app-section panel hidden">
+        <div class="section-heading">
+          <h2 class="section-heading__title">Mentor Roadmap</h2>
+          <p class="section-heading__description">Your step-by-step guide to executing the selected project.</p>
+        </div>
+
+        <div id="roadmap-loading" class="loading-state hidden" aria-live="polite">
+          <div class="loading-state__indicator"></div>
+          <p>Generating personalized mentor roadmap...</p>
+        </div>
+
+        <div id="roadmap-container" class="roadmap">
+          <!-- Roadmap phases injected here via JS -->
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>ProjectMentor AI &copy; 2026. Powered by Google Gemini.</p>
+    </footer>
+  </div>
+
+  <script type="module" src="js/ui.js"></script>
+</body>
+</html>

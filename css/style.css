@@ -1,0 +1,487 @@
+/**
+ * Purpose: Styles the ProjectMentorAI interface with a bold, flat color-blocked 
+ * aesthetic, asymmetrical grid, and editorial typography.
+ * Exports: Global design tokens and reusable application layout classes.
+ * Dependencies: Semantic HTML structure defined by index.html and ui.js.
+ */
+
+ :root {
+  --color-page: #fdfae9;       /* Pale yellow background */
+  --color-ink: #000000;        /* Pure black */
+  --color-surface: #ffffff;    /* Pure white */
+  --color-hero: #d2c8f8;       /* Lavender / Purple */
+  --color-cta: #ffdc3c;        /* Bright warm yellow */
+  --color-badge: #ff5e94;      /* Magenta/Pink for tags */
+  --color-muted: #555555;      
+  
+  --border-thick: 3px solid var(--color-ink);
+  --border-thin: 1px solid var(--color-ink);
+  
+  --radius-pill: 9999px;
+  --radius-large: 24px;
+  --radius-medium: 12px;
+  --radius-small: 6px;
+  
+  --content-width: 80rem;
+  --transition-fast: 150ms ease;
+  
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* --- App Layout --- */
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-header {
+  padding: 1.5rem 2rem;
+  background-color: var(--color-page);
+  border-bottom: var(--border-thick);
+}
+
+.app-header__content {
+  width: min(100%, var(--content-width));
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-header__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.app-header__description, .app-header__eyebrow {
+  display: none; /* Hidden for the new minimalist header */
+}
+
+.app-header__nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-link {
+  background: var(--color-surface);
+  border: var(--border-thick);
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.nav-link:hover {
+  background-color: var(--color-hero);
+  transform: translateY(-2px);
+}
+
+.app-main {
+  width: min(100% - 3rem, var(--content-width));
+  margin: 3rem auto 4rem;
+  display: grid;
+  gap: 4rem;
+}
+
+/* --- Profile Section (Lavender Hero) --- */
+.profile-section {
+  background-color: var(--color-hero);
+  border: var(--border-thick);
+  border-radius: var(--radius-large);
+  padding: 4rem 3rem;
+  position: relative;
+  overflow: visible;
+  box-shadow: 8px 8px 0 var(--color-ink);
+}
+
+.rotated-badge {
+  position: absolute;
+  top: -20px;
+  right: 20px;
+  background-color: var(--color-badge);
+  color: var(--color-surface);
+  border: var(--border-thick);
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  transform: rotate(10deg);
+  box-shadow: 3px 3px 0 var(--color-ink);
+  z-index: 10;
+}
+
+.hero-heading {
+  margin: 0 0 2rem;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 900;
+  line-height: 1;
+  max-width: 20ch;
+}
+
+.section-heading__description {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+/* --- Form --- */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.form-field--full {
+  grid-column: 1 / -1;
+}
+
+.form-field__label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--color-surface);
+  border: var(--border-thick);
+  border-radius: var(--radius-medium);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: transform var(--transition-fast);
+}
+
+.form-field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+
+/* --- Buttons --- */
+.form-actions {
+  margin-top: 2rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2.5rem;
+  border: var(--border-thick);
+  border-radius: var(--radius-pill);
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  background-color: var(--color-surface);
+}
+
+.button:hover:not(:disabled) {
+  transform: translate(-4px, -4px);
+  box-shadow: 6px 6px 0 var(--color-ink);
+}
+
+.button--primary {
+  background-color: var(--color-cta);
+  color: var(--color-ink);
+}
+
+/* --- Ideas Grid --- */
+.results-toolbar__title {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin: 0 0 0.5rem;
+}
+
+.idea-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.idea-card {
+  background-color: var(--color-surface);
+  border: var(--border-thick);
+  border-radius: var(--radius-large);
+  padding: 2.5rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: transform var(--transition-fast);
+}
+
+.idea-card--selected {
+  background-color: #fff6e5;
+  box-shadow: 8px 8px 0 var(--color-ink);
+  transform: translateY(-4px);
+}
+
+.idea-card__rank {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  background-color: var(--color-badge);
+  color: var(--color-surface);
+  border: var(--border-thick);
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  transform: rotate(8deg);
+  box-shadow: 2px 2px 0 var(--color-ink);
+}
+
+.idea-card__header {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.idea-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+/* Score Block Element targeted to existing JS HTML */
+.score-panel {
+  background-color: var(--color-page);
+  border: var(--border-thick);
+  border-radius: var(--radius-medium);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.score-panel__heading {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.score-panel__heading span:first-child {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.score-panel__overall {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.score-list {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+}
+
+.score-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.score-bar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-top: 0.2rem;
+}
+
+.score-bar__fill {
+  height: 100%;
+  background-color: var(--color-ink);
+  transition: width 300ms ease;
+}
+
+/* --- Roadmap Phase --- */
+.roadmap-phase-list {
+  display: grid;
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.roadmap-phase {
+  background-color: var(--color-surface);
+  border: var(--border-thick);
+  border-radius: var(--radius-large);
+  padding: 2.5rem;
+  display: grid;
+  gap: 1rem;
+  position: relative;
+}
+
+/* Pseudo-element to act as the decorative arrow icon button */
+.roadmap-phase::after {
+  content: '→';
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  background-color: var(--color-ink);
+  color: var(--color-surface);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.roadmap-phase__title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 0;
+  padding-right: 4rem;
+}
+
+.roadmap-phase__duration {
+  font-weight: 800;
+  color: var(--color-badge);
+  text-transform: uppercase;
+}
+
+.roadmap-phase__deliverable {
+  background-color: var(--color-page);
+  border: var(--border-thick);
+  border-radius: var(--radius-medium);
+  padding: 1.5rem;
+  font-weight: 700;
+}
+
+/* --- Status/Loading/Error --- */
+.status-message {
+  padding: 1.5rem;
+  border: var(--border-thick);
+  border-radius: var(--radius-medium);
+  font-weight: 800;
+  margin-top: 1rem;
+  background-color: var(--color-page);
+}
+
+.status-message--error {
+  background-color: #ffb3b3;
+}
+
+.status-message--success {
+  background-color: #b3ffb3;
+}
+
+.loading-state {
+  padding: 4rem;
+  background-color: var(--color-page);
+  border: var(--border-thick);
+  border-radius: var(--radius-large);
+  text-align: center;
+  font-weight: 800;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+
+[hidden], .hidden {
+  display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 62rem) {
+  .idea-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 44rem) {
+  .form-grid, .idea-grid {
+    grid-template-columns: 1fr;
+  }
+  .app-header__content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .profile-section {
+    padding: 2rem 1.5rem;
+  }
+  .roadmap-phase::after {
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+  }
+}
+
