@@ -142,8 +142,8 @@ app.post('/api/analyze-project', async (req, res) => {
   try {
     const profile = req.body;
 
-    if (!profile || !profile.skills || !profile.interests || !profile.experience
-      || !profile.careerGoal || !profile.budget || !profile.timeline
+    const requiredTextFields = ['skills', 'interests', 'experience', 'careerGoal', 'budget', 'timeline'];
+    if (!profile || requiredTextFields.some((field) => typeof profile[field] !== 'string' || !profile[field].trim())
       || !Number.isInteger(profile.teamSize)) {
       return res.status(400).json({ error: 'Invalid request. Please fill out all profile fields.' });
     }
@@ -256,6 +256,14 @@ Technologies: ${selectedIdea.technologies.join(', ')}`;
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+function startServer() {
+  return app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
+
+export { app, startServer };
