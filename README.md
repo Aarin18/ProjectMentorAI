@@ -1,28 +1,30 @@
 # ProjectMentor AI
 
-A Project Intelligence & Feasibility Engine for final-year students. Generate, score, and select technical project ideas based on your skills and career goals, then receive a step-by-step mentor roadmap to build it.
+A Project Intelligence & Feasibility Engine for final-year students. Submit your profile and receive a structured feasibility analysis, technical recommendations, risks, mentor advice, and a practical roadmap.
 
 ## Features
 
-- **Profile-Based Idea Generation**: Uses the Google Gemini API to produce 3-5 tailored candidate project ideas.
-- **Deterministic Scoring Engine**: Locally scores each idea based on Skill Match, Feasibility, Innovation, Career Value, and Technical Depth.
-- **Mentor Roadmap Generation**: Select an idea and generate a phase-by-phase execution roadmap.
-- **Privacy-First**: 100% client-side. The API key and profile data are stored only in your browser's `localStorage` and never sent to a backend database.
+- **Profile-Based Analysis**: Uses Gemini to return a structured feasibility analysis for the submitted project profile.
+- **Server-Side Gemini Integration**: The official `@google/genai` SDK is used only by the backend.
+- **Privacy-First**: Profile data is only sent to the backend for analysis. The API key is stored securely on the server and never exposed to the frontend.
 
 ## Architecture & Tech Stack
 
-- **Tech Stack**: Vanilla HTML5, CSS3, JavaScript ES6+
-- **External Dependencies**: Google Gemini API via client-side fetch (no external libraries like React or Node.js backends).
-- **Hosting**: Designed as a static website, fully deployable to GitHub Pages, Netlify, or Vercel.
+- **Frontend**: Vanilla HTML5, CSS3, JavaScript ES6+
+- **Backend**: Node.js Express server
+- **External Dependencies**: Google Gemini API via the server-side `@google/genai` SDK.
 
 ## File Structure
 
 ```
 ├── index.html         # Main entry point with the semantic layout and app shell
+├── server.js          # Express backend server interacting with Gemini
+├── package.json       # Node.js dependencies
+├── .env.example       # Example environment variables file
 ├── css/
 │   └── style.css      # Design tokens and layout classes
 └── js/
-    ├── api.js         # Handles Gemini API fetch calls and strict JSON parsing
+    ├── api.js         # Handles backend API fetch calls
     ├── scoring.js     # Deterministic scoring engine
     ├── storage.js     # Helpers for reading/writing localStorage
     ├── ui.js          # Ties DOM events, state, and modules together
@@ -31,37 +33,32 @@ A Project Intelligence & Feasibility Engine for final-year students. Generate, s
 
 ## How to Run Locally
 
-Because this project uses ES6 Modules, you must run it through a local web server (opening `index.html` directly in the browser will result in CORS errors).
-
-**Option 1: Using Python**
 1. Open your terminal and navigate to the project folder.
-2. Run `python -m http.server 8000` (or `python3 -m http.server 8000`).
-3. Open your browser to `http://localhost:8000`.
-
-**Option 2: Using Node.js**
-1. Open your terminal and navigate to the project folder.
-2. Run `npx serve`.
-3. Open the `localhost` URL provided in the terminal.
+2. Install dependencies: `npm install`
+3. Create a `.env` file in the root directory based on `.env.example`:
+   ```
+    GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+4. Start the server: `npm start`
+5. Open your browser to `http://localhost:3000`.
 
 ## How to Add Your Gemini API Key
 
-1. Open the website in your browser.
-2. In the **Your Profile** section at the top, locate the **Gemini API Key** field.
-3. Paste your valid Google Gemini API key.
-4. Fill out the rest of the profile and click "Generate Project Ideas."
-5. The API key is securely saved in your browser's `localStorage` (as `projectmentor_api_key`) and automatically used for future requests.
+The Gemini API key is securely managed on the server side.
+
+**For Local Development:**
+Add your key to the `.env` file:
+`GEMINI_API_KEY=your_gemini_api_key_here`
+
+**For Deployment:**
+Configure `GEMINI_API_KEY` as a secret/environment variable in your hosting provider's dashboard (e.g., Vercel, Render, Heroku).
 
 ## How to Deploy
 
-The application is completely static, making it trivial to deploy for free.
+The application now requires a Node.js runtime.
 
-**Using Netlify (Easiest)**
-1. Go to [Netlify Drop](https://app.netlify.com/drop).
-2. Drag and drop the `ProjectMentorAI` folder onto the page.
-
-**Using GitHub Pages**
-1. Initialize a git repository: `git init`, `git add .`, `git commit -m "Initial commit"`.
-2. Push the code to a new public repository on GitHub.
-3. Go to **Settings > Pages** in your GitHub repo.
-4. Under **Build and deployment**, select **Deploy from a branch** and choose the `main` branch.
-5. Click **Save** to publish.
+**Using Render / Heroku / Vercel**
+1. Push your repository to GitHub.
+2. Connect the repository to your hosting provider.
+3. Add the `GEMINI_API_KEY` to the environment variables/secrets section.
+4. Deploy the application.

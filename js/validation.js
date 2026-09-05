@@ -1,7 +1,7 @@
 /**
  * Purpose: Validates student profiles, Gemini responses, stored data, and
  * application errors before other modules use them.
- * Exports: normalizeError, validateStudentProfile, validateProjectIdeas,
+ * Exports: normalizeError, validateStudentProfile, validateProjectAnalysis,
  * validateSelectedIdea, and validateMentorRoadmap.
  * Dependencies: Standard browser JavaScript only; no DOM, API, or storage access.
  */
@@ -24,6 +24,10 @@ const ROADMAP_LIMITS = Object.freeze({
   minimumPhases: 1,
   maximumPhases: 12,
 });
+
+const ANALYSIS_ARRAY_FIELDS = Object.freeze([
+  'requiredSkills', 'recommendedTechStack', 'risks', 'improvements', 'mentorAdvice', 'roadmap',
+]);
 
 const ERROR_CODES = Object.freeze({
   INVALID_INPUT: 'INVALID_INPUT',
@@ -230,6 +234,42 @@ function validateProjectIdeas(ideas) {
   return createValidationResult(true, normalizedIdeas);
 }
 
+function validateProjectAnalysis(analysis) {
+  if (!isPlainObject(analysis) || !Number.isInteger(analysis.feasibilityScore)
+    || analysis.feasibilityScore < 0 || analysis.feasibilityScore > 100) {
+    return createValidationResult(false, null, [
+      createValidationError('analysis', 'Gemini returned an invalid project analysis.'),
+    ]);
+  }
+
+  const errors = [];
+  ['verdict', 'summary', 'problemAnalysis', 'technicalDifficulty', 'estimatedDuration']
+    .forEach((field) => {
+      if (typeof analysis[field] !== 'string' || analysis[field].trim() === '') {
+        errors.push(createValidationError(field, `Analysis ${field} is required.`));
+      }
+    });
+  ANALYSIS_ARRAY_FIELDS.forEach((field) => {
+    if (!Array.isArray(analysis[field]) || analysis[field].length === 0
+      || analysis[field].some((item) => typeof item !== 'string' || item.trim() === '')) {
+      errors.push(createValidationError(field, `Analysis ${field} must contain text items.`));
+    }
+  });
+
+  if (errors.length > 0) return createValidationResult(false, null, errors);
+  return createValidationResult(true, {
+    ...analysis,
+    verdict: analysis.verdict.trim(),
+    summary: analysis.summary.trim(),
+    problemAnalysis: analysis.problemAnalysis.trim(),
+    technicalDifficulty: analysis.technicalDifficulty.trim(),
+    estimatedDuration: analysis.estimatedDuration.trim(),
+    ...Object.fromEntries(ANALYSIS_ARRAY_FIELDS.map((field) => [
+      field, analysis[field].map((item) => item.trim()),
+    ])),
+  });
+}
+
 function validateSelectedIdea(idea) {
   if (!isPlainObject(idea)) {
     return createValidationResult(false, null, [
@@ -345,6 +385,7 @@ export {
   ERROR_CODES,
   normalizeError,
   validateMentorRoadmap,
+  validateProjectAnalysis,
   validateProjectIdeas,
   validateSelectedIdea,
   validateStudentProfile,

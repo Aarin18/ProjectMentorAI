@@ -11,7 +11,6 @@ const StorageKeys = Object.freeze({
   IDEAS: 'projectmentor_ideas',
   SELECTED_IDEA: 'projectmentor_selected_idea',
   ROADMAP: 'projectmentor_roadmap',
-  API_KEY: 'projectmentor_api_key',
 });
 
 function saveItem(key, value) {

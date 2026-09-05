@@ -36,12 +36,7 @@
         
         <form id="profile-form" class="profile-form">
           <div class="form-grid">
-            <div class="form-field form-field--full">
-              <label for="api-key" class="form-field__label">Gemini API Key</label>
-              <input type="password" id="api-key" placeholder="Enter your Gemini API key" required>
-              <p class="form-field__hint">Your key is stored locally in your browser and is never sent to our servers.</p>
-            </div>
-            
+
             <div class="form-field">
               <label for="skills" class="form-field__label">Skills & Technologies</label>
               <input type="text" id="skills" placeholder="e.g., Python, React, Data Analysis" required minlength="2" maxlength="1000">
@@ -76,7 +71,7 @@
           <div id="status-message" class="status-message" aria-live="polite"></div>
 
           <div class="form-actions">
-            <button type="submit" class="button button--primary" id="generate-ideas-btn">Generate Project Ideas</button>
+            <button type="submit" class="button button--primary" id="generate-ideas-btn">Analyze My Project</button>
           </div>
         </form>
       </section>
@@ -85,13 +80,13 @@
         <div class="results-toolbar">
           <div>
             <h2 class="results-toolbar__title">Recommended Projects</h2>
-            <p class="results-toolbar__description">Based on your profile, we generated the following ideas.</p>
+            <p class="results-toolbar__description">A feasibility analysis tailored to your project profile.</p>
           </div>
         </div>
 
         <div id="ideas-loading" class="loading-state hidden" aria-live="polite">
           <div class="loading-state__indicator"></div>
-          <p>Analyzing profile and generating ideas...</p>
+          <p>Analyzing your project...</p>
         </div>
 
         <div id="idea-grid" class="idea-grid">
